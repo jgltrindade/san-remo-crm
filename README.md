@@ -44,11 +44,11 @@ Etapas do funil: **Novo → Em contato → Visita agendada → Proposta → Ganh
 
 ## 3. Executar localmente
 
-Pré-requisitos: Node.js 20+ e um projeto Supabase (nuvem ou local via Supabase CLI).
+Pré-requisitos: Node.js 20+ e um projeto Supabase na nuvem (plano gratuito). **Não é preciso instalar nada do Supabase**: tudo é feito pelo painel web.
 
 ```bash
 npm install
-cp .env.example .env.local     # preencha VITE_SUPABASE_URL e VITE_SUPABASE_ANON_KEY
+cp .env.example .env.local     # preencha VITE_SUPABASE_URL e VITE_SUPABASE_PUBLISHABLE_KEY
 npm run dev                    # http://localhost:5173
 ```
 
@@ -65,7 +65,7 @@ Scripts úteis:
 ## 4. Configurar o Supabase
 
 1. Crie um projeto em [supabase.com](https://supabase.com).
-2. Em **Project Settings → API**, copie a **Project URL** e a chave **anon public** para o `.env.local`.
+2. Em **Project Settings → API Keys** (ou no botão **Connect** do topo do painel), copie a **Project URL** e a **Publishable key** (`sb_publishable_…`) para o `.env.local`. Projetos antigos mostram uma **anon key** (`eyJ…`) — o app aceita as duas (`VITE_SUPABASE_PUBLISHABLE_KEY` ou `VITE_SUPABASE_ANON_KEY`).
 3. Em **Authentication → Providers → Email**, mantenha o login por e-mail e senha habilitado.
 4. **Recomendado:** em **Authentication → Sign In / Providers**, desative **Allow new users to sign up**. As contas são criadas pelo gestor. Mesmo com o cadastro aberto, um novo usuário sempre nasce como corretor (o papel enviado no cadastro é ignorado pelo banco), mas não há por que expor o cadastro.
 5. Em **Authentication → URL Configuration**, defina o **Site URL** com o domínio de produção (ex.: `https://san-remo-crm.vercel.app`).
@@ -81,7 +81,9 @@ As migrations estão em `supabase/migrations/` e recriam o banco do zero, em ord
 | `…120200_round_robin_distribution.sql` | `distribution_history`, cursor da fila, RPCs `distribute_next_lead`, `get_presence_overview`, `get_my_presence` |
 | `…120300_rls_and_grants.sql` | Políticas RLS e privilégios |
 
-**Opção A — Supabase CLI (recomendada):**
+**Opção A — SQL Editor do painel (sem instalar nada):** abra **SQL Editor → New query**, cole todo o conteúdo de `supabase/setup-completo.sql` (as 4 migrations juntas, na ordem) e clique em **Run**.
+
+**Opção B — Supabase CLI (via `npx`, sem instalação global):**
 
 ```bash
 npx supabase login
@@ -89,7 +91,7 @@ npx supabase link --project-ref SEU_PROJECT_REF
 npx supabase db push
 ```
 
-**Opção B — SQL Editor do painel:** execute o conteúdo de cada arquivo, na ordem acima.
+Para manter `setup-completo.sql` em sincronia após mudar uma migration, concatene os arquivos de `supabase/migrations/` na ordem.
 
 > Não execute `supabase/tests/00_supabase_auth_shim.sql` no Supabase. Ele existe apenas para testar as migrations num Postgres puro.
 
@@ -108,7 +110,7 @@ Nenhuma senha está no código. Escolha você a senha das contas de demonstraç�
 **Passo 1 — criar as contas** (escolha uma opção):
 
 - **Painel:** Authentication → Users → **Add user → Create new user**, informe e-mail e senha e marque **Auto Confirm User**. Repita para os 5 e-mails.
-- **Script local:** preencha `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY` e `DEMO_PASSWORD` no `.env.local` e rode `npm run demo:users`. A chave `service_role` fica apenas na sua máquina.
+- **Script local:** preencha `SUPABASE_URL`, `SUPABASE_SECRET_KEY` (a **Secret key** `sb_secret_…`, ou a `service_role` em projetos antigos) e `DEMO_PASSWORD` no `.env.local` e rode `npm run demo:users`. A chave secreta fica apenas na sua máquina.
 
 Todo usuário criado recebe automaticamente um perfil de **corretor** (trigger `on_auth_user_created`).
 
@@ -127,17 +129,18 @@ Presença e histórico de distribuições **não** são semeados de propósito: 
 | Variável | Onde | Descrição |
 |---|---|---|
 | `VITE_SUPABASE_URL` | Frontend / Vercel | URL do projeto Supabase |
-| `VITE_SUPABASE_ANON_KEY` | Frontend / Vercel | Chave pública **anon** (protegida por RLS) |
+| `VITE_SUPABASE_PUBLISHABLE_KEY` | Frontend / Vercel | Chave pública **publishable** (`sb_publishable_…`), protegida por RLS |
+| `VITE_SUPABASE_ANON_KEY` | Frontend / Vercel | Alternativa para projetos antigos (chave **anon**). Use uma ou outra |
 | `VITE_PUBLIC_APP_URL` | Frontend / Vercel (opcional) | URL pública usada no link do QR Code. Vazia = origem atual do navegador |
 | `SUPABASE_URL` | Somente local | Usada por `npm run demo:users` |
-| `SUPABASE_SERVICE_ROLE_KEY` | **Somente local** | Nunca use prefixo `VITE_` nem configure na Vercel |
+| `SUPABASE_SECRET_KEY` | **Somente local** | Secret key (`sb_secret_…`) ou `service_role`. Nunca use prefixo `VITE_` nem configure na Vercel |
 | `DEMO_PASSWORD` | Somente local | Senha das contas de demonstração |
 
 ## 8. Publicar na Vercel
 
 1. Envie o repositório ao GitHub.
 2. Na Vercel: **Add New → Project**, importe o repositório. O preset **Vite** é detectado (`vercel.json` já define build, saída e rewrites da SPA).
-3. Em **Environment Variables**, adicione `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY` e, opcionalmente, `VITE_PUBLIC_APP_URL`.
+3. Em **Environment Variables**, adicione `VITE_SUPABASE_URL`, `VITE_SUPABASE_PUBLISHABLE_KEY` (ou `VITE_SUPABASE_ANON_KEY`) e, opcionalmente, `VITE_PUBLIC_APP_URL`.
 4. **Deploy.** Depois, atualize o **Site URL** do Supabase Auth com o domínio gerado.
 
 O `vercel.json` reescreve todas as rotas para `index.html` (necessário para abrir `/presence/check-in?token=…` direto pelo QR Code) e adiciona cabeçalhos de segurança básicos.
@@ -289,7 +292,7 @@ Além das tabelas sugeridas, há um schema `private`, não exposto pela API, com
 - **Trigger `leads_guard`:** corretor só altera a etapa, e o responsável precisa ser um corretor. `created_at` é imutável e `updated_at` é mantido pelo banco.
 - **Privilégios:** `anon` não acessa nada. Escrita em presença, tokens e histórico só via RPC. `EXECUTE` revogado de `PUBLIC`/`anon`.
 - **Funções `security definer`** com `search_path = ''` e nomes totalmente qualificados.
-- **Frontend:** só a chave `anon`. Os guards de rota são apenas UX, e o login aceita só redirecionamentos internos.
+- **Frontend:** só a chave pública (publishable/anon). Os guards de rota são apenas UX, e o login aceita só redirecionamentos internos.
 
 ### Identidade visual
 

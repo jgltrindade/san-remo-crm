@@ -83,7 +83,7 @@ export default function LoginPage() {
             <div role="alert" className="mt-6 flex gap-2 rounded-lg border border-amber-200 bg-warn-50 p-3 text-sm text-amber-900">
               <TriangleAlert className="mt-0.5 size-4 shrink-0" aria-hidden />
               <span>
-                Supabase não configurado. Defina <code>VITE_SUPABASE_URL</code> e <code>VITE_SUPABASE_ANON_KEY</code> no arquivo{' '}
+                Supabase não configurado. Defina <code>VITE_SUPABASE_URL</code> e <code>VITE_SUPABASE_PUBLISHABLE_KEY</code> no arquivo{' '}
                 <code>.env.local</code>.
               </span>
             </div>

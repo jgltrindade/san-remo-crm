@@ -2,11 +2,11 @@
 // =============================================================================
 // Cria (ou confirma) as contas de demonstração no Supabase Auth.
 //
-// Roda SOMENTE na sua máquina — usa a SUPABASE_SERVICE_ROLE_KEY, que ignora
+// Roda SOMENTE na sua máquina — usa a chave secreta do projeto, que ignora
 // RLS e nunca deve ir para o frontend nem para a Vercel.
 //
 // Uso:
-//   1. Crie .env.local com SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY e DEMO_PASSWORD
+//   1. Crie .env.local com SUPABASE_URL, SUPABASE_SECRET_KEY e DEMO_PASSWORD
 //   2. npm run demo:users
 //   3. Rode supabase/seed.sql (promove a gestora e cria os leads)
 //
@@ -15,11 +15,12 @@
 import { createClient } from '@supabase/supabase-js';
 
 const url = process.env.SUPABASE_URL;
-const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+// "Secret key" (projetos novos) ou "service_role key" (projetos antigos)
+const serviceKey = process.env.SUPABASE_SECRET_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY;
 const password = process.env.DEMO_PASSWORD;
 
 if (!url || !serviceKey || !password) {
-  console.error('Defina SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY e DEMO_PASSWORD em .env.local.');
+  console.error('Defina SUPABASE_URL, SUPABASE_SECRET_KEY e DEMO_PASSWORD em .env.local.');
   process.exit(1);
 }
 if (password.length < 8) {
