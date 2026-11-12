@@ -1,0 +1,113 @@
+@import 'tailwindcss';
+
+/* -----------------------------------------------------------------------------
+   Identidade visual — San Remo CRM
+   Azul "Atlântico" para confiança, verde-mata para ação e presença válida.
+   ----------------------------------------------------------------------------- */
+/* `static`: emite todas as variáveis mesmo quando usadas só via var() (ex.: cores
+   das etapas aplicadas por style inline e no gráfico). */
+@theme static {
+  --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-display: 'Instrument Serif', ui-serif, Georgia, serif;
+
+  --color-canvas: #f5f7fa;
+  --color-surface: #ffffff;
+  --color-ink: #18212f;
+  --color-muted: #5b6577;
+  --color-subtle: #8a93a3;
+  --color-line: #e2e7ee;
+  --color-line-strong: #cfd6e0;
+
+  --color-navy-50: #eef2f8;
+  --color-navy-100: #d9e1ee;
+  --color-navy-200: #b3c2da;
+  --color-navy-400: #5a73a0;
+  --color-navy-600: #26406b;
+  --color-navy-700: #1b3156;
+  --color-navy-800: #13243f;
+  --color-navy-900: #0d1a2e;
+
+  --color-mata-50: #e9f6ef;
+  --color-mata-100: #cdebdb;
+  --color-mata-500: #2fb173;
+  --color-mata-600: #1e8a5a;
+  --color-mata-700: #176d47;
+
+  --color-danger-50: #fdeeee;
+  --color-danger-600: #c43d3d;
+  --color-warn-50: #fdf5e6;
+  --color-warn-600: #b7791f;
+
+  /* Etapas do funil */
+  --color-stage-new: #64748b;
+  --color-stage-contacting: #2f6fde;
+  --color-stage-scheduled: #c7841a;
+  --color-stage-proposal: #7c4dcc;
+  --color-stage-won: #1e8a5a;
+  --color-stage-lost: #c43d3d;
+
+  --radius-card: 0.875rem;
+  --shadow-card: 0 1px 2px rgb(19 36 63 / 0.05), 0 4px 16px -8px rgb(19 36 63 / 0.12);
+  --shadow-lift: 0 2px 4px rgb(19 36 63 / 0.06), 0 16px 32px -12px rgb(19 36 63 / 0.22);
+
+  --animate-fade: fade 180ms ease-out;
+  @keyframes fade {
+    from {
+      opacity: 0;
+    }
+  }
+  --animate-slide-left: slide-left 260ms cubic-bezier(0.2, 0.8, 0.2, 1);
+  @keyframes slide-left {
+    from {
+      transform: translateX(100%);
+    }
+  }
+  --animate-slide-right: slide-right 260ms cubic-bezier(0.2, 0.8, 0.2, 1);
+  @keyframes slide-right {
+    from {
+      transform: translateX(-100%);
+    }
+  }
+
+  --animate-pop: pop 380ms cubic-bezier(0.2, 0.9, 0.3, 1.25);
+  @keyframes pop {
+    from {
+      opacity: 0;
+      transform: scale(0.94);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+}
+
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+  body {
+    @apply bg-canvas text-ink font-sans antialiased;
+    font-feature-settings: 'ss01', 'cv11';
+  }
+  :focus-visible {
+    outline: 2px solid var(--color-mata-600);
+    outline-offset: 2px;
+  }
+  ::selection {
+    background: var(--color-navy-100);
+  }
+}
+
+@utility tabular {
+  font-variant-numeric: tabular-nums;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 1ms !important;
+    transition-duration: 1ms !important;
+  }
+}
